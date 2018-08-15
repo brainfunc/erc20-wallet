@@ -18,6 +18,7 @@ class App extends Component {
     this.setBFTTokenBalance = this.setBFTTokenBalance.bind(this);
 
     this.refreshState = this.refreshState.bind(this);
+    this.startListeningForEvents = this.startListeningForEvents.bind(this);
 
     this.handleSendTokenChange = this.handleSendTokenChange.bind(this);
     this.handleSendAddressChange = this.handleSendAddressChange.bind(this);
@@ -41,7 +42,7 @@ class App extends Component {
           tokens : window.web3.fromWei(tkns, 'ether').toNumber()
         })
       }
-      console.log(err)
+      // console.log(err)
     })
   }
 
@@ -55,7 +56,7 @@ class App extends Component {
           balance: window.web3.fromWei(bal, 'ether').toNumber()
         })
       }
-      console.log(err)
+      // console.log(err)
     })
   }
 
@@ -87,7 +88,8 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.refreshState()
+    this.refreshState();
+    this.startListeningForEvents();
   }
 
   refreshState() {
@@ -96,7 +98,22 @@ class App extends Component {
     this.setBFTTokenBalance();
   }
 
+  startListeningForEvents() {
+    console.log("Starting to listen for events...");
+    const contract = window.web3.eth.contract(config.contractAbi)
+    .at(config.contractAddress, (err, ctr) => {});
+    // Or pass a callback to start watching immediately
+    var currentComponent = this;
+    var events = contract.allEvents(function(error, log) {
+      if (!error) {
+        console.log(log);
+        currentComponent.refreshState();
+      }
+    });
+  }
+
   render() {
+    console.log("Rendering...");
     return (
       <div className='container'>
         <h1> Basic ERC20 Wallet - BrainFunc Token </h1>
